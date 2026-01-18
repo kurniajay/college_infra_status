@@ -1,0 +1,16 @@
+- name: Install Docker
+  hosts: local
+  become: true
+  tasks:
+    - name: Install Docker (Debian/Ubuntu)
+      apt:
+        name:
+          - docker.io
+        update_cache: true
+      when: ansible_os_family == "Debian"
+
+    - name: Enable and start Docker
+      service:
+        name: docker
+        state: started
+        enabled: true

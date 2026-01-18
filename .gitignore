@@ -1,0 +1,15 @@
+node_modules
+.DS_Store
+.env
+**/data
+.env.*
+*.db
+*.sqlite
+*.sqlite3
+dist
+build
+coverage
+.vscode
+*.log
+*.pem
+*kubeconfig*

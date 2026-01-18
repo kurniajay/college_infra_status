@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: infra-config
+  namespace: infra
+data:
+  ADMIN_SEED_EMAIL: admin@college.local
+  DB_PATH: /data/app.db

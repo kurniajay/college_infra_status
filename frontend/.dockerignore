@@ -1,0 +1,10 @@
+node_modules
+npm-debug.log
+vite.config.*.timestamp-*.mjs
+vite.config.*.timestamp-*.cjs
+dist
+.git
+.gitignore
+README.md
+.env
+.env.*

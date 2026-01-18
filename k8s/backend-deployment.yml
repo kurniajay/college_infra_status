@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: infra-backend
+  namespace: infra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: infra-backend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: infra-backend
+    spec:
+      containers:
+        - name: backend
+          image: infra-backend:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: ADMIN_SEED_EMAIL
+              valueFrom:
+                configMapKeyRef:
+                  name: infra-config
+                  key: ADMIN_SEED_EMAIL
+            - name: ADMIN_SEED_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: infra-secrets
+                  key: ADMIN_SEED_PASSWORD
+            - name: DB_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: infra-config
+                  key: DB_PATH
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: infra-backend-data

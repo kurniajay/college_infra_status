@@ -1,0 +1,20 @@
+- name: Deploy infra app to Kubernetes
+  hosts: local
+  vars:
+    kube_context: minikube
+    manifest_dir: "{{ playbook_dir }}/../k8s"
+  tasks:
+    - name: Ensure namespace exists
+      command: kubectl --context {{ kube_context }} apply -f {{ manifest_dir }}/namespace.yml
+
+    - name: Apply ConfigMap and Secret
+      command: kubectl --context {{ kube_context }} apply -f {{ manifest_dir }}/configmap.yml
+
+    - name: Apply Secrets
+      command: kubectl --context {{ kube_context }} apply -f {{ manifest_dir }}/secret.yml
+
+    - name: Apply backend manifests
+      command: kubectl --context {{ kube_context }} apply -f {{ manifest_dir }}/backend-pvc.yml -f {{ manifest_dir }}/backend-deployment.yml -f {{ manifest_dir }}/backend-service.yml -f {{ manifest_dir }}/backend-hpa.yml
+
+    - name: Apply frontend manifests
+      command: kubectl --context {{ kube_context }} apply -f {{ manifest_dir }}/frontend-deployment.yml -f {{ manifest_dir }}/frontend-service.yml
