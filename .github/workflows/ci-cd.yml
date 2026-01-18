@@ -6,7 +6,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAMESPACE: your-org
+  IMAGE_NAMESPACE: kurniajay
   BACKEND_IMAGE: infra-backend
   FRONTEND_IMAGE: infra-frontend
 

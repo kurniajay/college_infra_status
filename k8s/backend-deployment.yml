@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: infra-backend:v1
+          image: ghcr.io/kurniajay/infra-backend:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
