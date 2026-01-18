@@ -3,7 +3,27 @@
   vars:
     kube_context: minikube
     manifest_dir: "{{ playbook_dir }}/../k8s"
+    registry: ghcr.io
+    image_namespace: kurniajay
+    backend_image: infra-backend
+    frontend_image: infra-frontend
+    image_tag: latest
+    images_public: true
   tasks:
+    - name: Ensure minikube is running
+      shell: |
+        status=$(minikube status -p minikube --format '{% raw %}{{.Host}}{% endraw %}' 2>/dev/null || echo Stopped)
+        if [ "$status" != "Running" ]; then
+          minikube start -p minikube
+        else
+          echo "minikube already running"
+        fi
+      register: minikube_start
+
+    - name: Show minikube start output
+      debug:
+        var: minikube_start.stdout
+
     - name: Ensure namespace exists
       command: kubectl --context {{ kube_context }} apply -f {{ manifest_dir }}/namespace.yml
 
@@ -18,3 +38,46 @@
 
     - name: Apply frontend manifests
       command: kubectl --context {{ kube_context }} apply -f {{ manifest_dir }}/frontend-deployment.yml -f {{ manifest_dir }}/frontend-service.yml
+
+    - name: Gather GHCR env vars
+      set_fact:
+        ghcr_user: "{{ lookup('env','GHCR_USERNAME') | default('', true) }}"
+        ghcr_token: "{{ lookup('env','GHCR_TOKEN') | default('', true) }}"
+        ghcr_email: "{{ lookup('env','GHCR_EMAIL') | default('devnull@example.com', true) }}"
+
+    - name: Create GHCR imagePull secret in namespace (if images are private and credentials provided)
+      when: not images_public
+      shell: |
+        if [ -n "{{ ghcr_token }}" ]; then
+          kubectl --context {{ kube_context }} -n infra create secret docker-registry ghcr-secret \
+            --docker-server={{ registry }} \
+            --docker-username={{ ghcr_user }} \
+            --docker-password={{ ghcr_token }} \
+            --docker-email={{ ghcr_email }} --dry-run=client -o yaml | kubectl --context {{ kube_context }} apply -f -
+        else
+          echo "GHCR_TOKEN not set, skipping ghcr-secret creation"
+        fi
+      changed_when: "'created' in result.stdout or 'configured' in result.stdout"
+      register: result
+
+    - name: Patch deployments to add imagePullSecrets when secret exists (skip for public images)
+      when: not images_public
+      shell: |
+        if [ -n "{{ ghcr_token }}" ]; then
+          kubectl --context {{ kube_context }} -n infra patch deployment infra-backend -p '{"spec":{"template":{"spec":{"imagePullSecrets":[{"name":"ghcr-secret"}]}}}}' || true
+          kubectl --context {{ kube_context }} -n infra patch deployment infra-frontend -p '{"spec":{"template":{"spec":{"imagePullSecrets":[{"name":"ghcr-secret"}]}}}}' || true
+        else
+          echo "No GHCR credentials; not patching imagePullSecrets"
+        fi
+
+    - name: Set deployments to pull images from GHCR
+      shell: |
+        kubectl --context {{ kube_context }} -n infra set image deployment/infra-backend backend={{ registry }}/{{ image_namespace }}/{{ backend_image }}:{{ image_tag }}
+        kubectl --context {{ kube_context }} -n infra set image deployment/infra-frontend frontend={{ registry }}/{{ image_namespace }}/{{ frontend_image }}:{{ image_tag }}
+
+    - name: Wait for rollouts
+      shell: |
+        kubectl --context {{ kube_context }} -n infra rollout status deployment/infra-backend
+        kubectl --context {{ kube_context }} -n infra rollout status deployment/infra-frontend
+      register: rollout
+      failed_when: rollout.rc != 0 and rollout.rc is defined
