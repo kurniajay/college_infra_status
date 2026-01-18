@@ -95,7 +95,7 @@ export function seedInfrastructure(db) {
     { club_id: "C40", name: "Cricket Team", category: "Sports", associated_department: null, base_room: "Sports Office", uses_shared_infra: 1 },
     { club_id: "C41", name: "Football Team", category: "Sports", associated_department: null, base_room: "Sports Office", uses_shared_infra: 1 },
     { club_id: "C42", name: "Basketball Team", category: "Sports", associated_department: null, base_room: "Indoor Stadium", uses_shared_infra: 1 },
-    { club_id: "C43", name: "Volleyball Team", category: "Sports", associated_department: null, base_room: "Indoor Stadium", uses_shared_infra: 1 },
+    { club_id: "C43", name: "Tennis Team", category: "Sports", associated_department: null, base_room: "Indoor Stadium", uses_shared_infra: 1 },
     { club_id: "C44", name: "Athletics Team", category: "Sports", associated_department: null, base_room: "Athletics Office", uses_shared_infra: 1 },
     { club_id: "C45", name: "Badminton Team", category: "Sports", associated_department: null, base_room: "Indoor Stadium", uses_shared_infra: 1 },
 
