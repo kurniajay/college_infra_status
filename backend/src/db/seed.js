@@ -211,7 +211,7 @@ export function seedInfrastructure(db) {
     { name: "Athletics Track", type: "Track", bookable: 1, status: "AVAILABLE" },
     { name: "Indoor Stadium", type: "Sports Hall", bookable: 1, status: "RESERVED", ...defaultUsage("RESERVED") },
     { name: "Basketball Court", type: "Court", bookable: 1, status: "AVAILABLE" },
-    { name: "Volleyball Court", type: "Court", bookable: 1, status: "IN_USE", ...defaultUsage("IN_USE") },
+    { name: "Tennis Court", type: "Court", bookable: 1, status: "IN_USE", ...defaultUsage("IN_USE") },
     { name: "Gym", type: "Gym", bookable: 0, status: "OPEN", open_time: "06:00", close_time: "21:00" },
 
     { name: "Boys Hostel", type: "Hostel", bookable: 0, status: "OPEN", open_time: "00:00", close_time: "23:59" },
