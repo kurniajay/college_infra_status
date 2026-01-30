@@ -21,7 +21,7 @@ spec:
       containers:
         - name: backend
           image: ghcr.io/kurniajay/infra-backend:latest
-          imagePullPolicy: IfNotPresent
+          
           ports:
             - containerPort: 3000
           env:

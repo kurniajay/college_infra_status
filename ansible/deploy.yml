@@ -10,6 +10,27 @@
     image_tag: latest
     images_public: true
   tasks:
+    - name: Determine image tag from env (IMAGE_TAG)
+      set_fact:
+        image_tag_final: "{{ lookup('env','IMAGE_TAG') | default('', true) }}"
+
+    - name: Use git SHA when IMAGE_TAG not provided
+      when: image_tag_final == ""
+      command: git rev-parse HEAD
+      args:
+        chdir: "{{ playbook_dir }}/.."
+      register: git_sha
+      failed_when: false
+
+    - name: Fallback to latest tag when git SHA unavailable
+      when: image_tag_final == ""
+      set_fact:
+        image_tag_final: "{{ git_sha.stdout | default('latest', true) }}"
+
+    - name: Show selected image tag
+      debug:
+        msg: "Using image tag: {{ image_tag_final }}"
+
     - name: Ensure minikube is running
       shell: |
         status=$(minikube status -p minikube --format '{% raw %}{{.Host}}{% endraw %}' 2>/dev/null || echo Stopped)
@@ -72,8 +93,8 @@
 
     - name: Set deployments to pull images from GHCR
       shell: |
-        kubectl --context {{ kube_context }} -n infra set image deployment/infra-backend backend={{ registry }}/{{ image_namespace }}/{{ backend_image }}:{{ image_tag }}
-        kubectl --context {{ kube_context }} -n infra set image deployment/infra-frontend frontend={{ registry }}/{{ image_namespace }}/{{ frontend_image }}:{{ image_tag }}
+        kubectl --context {{ kube_context }} -n infra set image deployment/infra-backend backend={{ registry }}/{{ image_namespace }}/{{ backend_image }}:{{ image_tag_final }}
+        kubectl --context {{ kube_context }} -n infra set image deployment/infra-frontend frontend={{ registry }}/{{ image_namespace }}/{{ frontend_image }}:{{ image_tag_final }}
 
     - name: Wait for rollouts
       shell: |

@@ -21,6 +21,6 @@ spec:
       containers:
         - name: frontend
           image: ghcr.io/kurniajay/infra-frontend:latest
-          imagePullPolicy: IfNotPresent
+          
           ports:
             - containerPort: 80
