@@ -8,6 +8,7 @@ import ScopeTabs from "./components/ScopeTabs.jsx";
 import ScopeFilters from "./components/ScopeFilters.jsx";
 import InfrastructureGrid from "./components/InfrastructureGrid.jsx";
 import AdminPanel from "./components/AdminPanel.jsx";
+import InfrastructureForm from "./components/InfrastructureForm.jsx";
 
 export default function App() {
   const [scope, setScope] = useState("GENERAL");
@@ -280,6 +281,19 @@ export default function App() {
           getStatusBadgeClass={statusBadge}
         />
       </main>
+
+      <InfrastructureForm
+        open={formOpen}
+        formData={formData}
+        error={error}
+        categories={CATEGORIES}
+        departments={DEPARTMENTS}
+        types={TYPES}
+        onChange={setFormData}
+        onClose={() => setFormOpen(false)}
+        onSubmit={submitForm}
+      />
+
       <AdminPanel
         open={adminPanelOpen}
         admin={admin}
