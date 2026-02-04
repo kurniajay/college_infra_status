@@ -11,9 +11,9 @@
     image_tag: latest
     images_public: true
   tasks:
-    - name: Determine image tag from env (IMAGE_TAG) or GITHUB_SHA, fallback to latest
+    - name: Get current git SHA
       set_fact:
-        image_tag_final: "{{ lookup('env','IMAGE_TAG') | default(lookup('env','GITHUB_SHA') | default('latest', true), true) }}"
+        image_tag_final: "{{ lookup('pipe', 'git rev-parse HEAD') }}"
 
     - name: Show selected image tag
       debug:
