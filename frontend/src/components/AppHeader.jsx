@@ -2,7 +2,7 @@ export default function AppHeader({ admin, onLoginClick, onLogout, onOpenAdminPa
   return (
     <header className="bg-white shadow-sm">
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-        <div className="text-xl font-semibold">College Infrastructure Dashboard</div>
+        <div className="text-xl font-semibold">College Infrastructure Status Dashboard</div>
         <div className="flex items-center gap-3">
           {admin ? (
             <>
